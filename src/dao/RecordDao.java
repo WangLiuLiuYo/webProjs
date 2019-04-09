@@ -3,6 +3,7 @@ package dao;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import commonObject.Record;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,7 +50,7 @@ public class RecordDao {
     private void insertFirstRecord(){
         String from="0".repeat(18),to=myCardId;
         String wid=WaterIdMaker.getWid(from,to);
-        insertRecord(new Record(0,new java.util.Date(),to,wid,0));
+        insertRecord(new Record(new BigDecimal(0),new java.util.Date(),to,wid,new BigDecimal(0)));
 
     }
 
@@ -58,7 +59,7 @@ public class RecordDao {
     private boolean createTable(){
         try{
             String sql="create table if not exists "+tableName;
-            sql=sql+" (changednum double not null,changeddate timestamp ,cardId char(18) not null,wid char(30) not null,balance double not null,primary key(wid));";
+            sql=sql+" (changednum decimal(20,2) not null,changeddate timestamp default current_timestamp ,cardId char(18) not null,wid char(30) not null,balance decimal(20,2) not null,primary key(wid));";
             PreparedStatement ps=conn.prepareStatement(sql);
             boolean r=ps.execute();
             this.haveTable=true;
@@ -87,11 +88,11 @@ public class RecordDao {
             }
             PreparedStatement ps=conn.prepareStatement("insert into "+tableName+" (changednum,changeddate,cardId,wid,balance) values " +
                     "(?,?,?,?,?)");
-            ps.setDouble(1,record.getChange());
+            ps.setBigDecimal(1, record.getChange());
             ps.setTimestamp(2,new Timestamp(record.getDate().getTime()));
             ps.setString(3,record.getToId());
             ps.setString(4,record.getWaterId());
-            ps.setDouble(5,record.getBalance());
+            ps.setBigDecimal(5,record.getBalance());
             ps.execute();
             return true;
         }catch (SQLException e){
@@ -113,11 +114,11 @@ public class RecordDao {
             ResultSet rs=ps.executeQuery();
             ArrayList<Record> records=new ArrayList<>();
             while (rs.next()){
-                records.add(new Record(rs.getDouble("changednum"),
+                records.add(new Record(rs.getBigDecimal("changednum"),
                         rs.getDate("changeddate"),
                         rs.getString("cardId"),
                         rs.getString("wid"),
-                        rs.getDouble("balance")));
+                        rs.getBigDecimal("balance")));
             }
             return records;
         }
@@ -127,7 +128,7 @@ public class RecordDao {
         }
 
     }
-    public double queryBalance(){
+    public BigDecimal queryBalance(){
         try{
             if(!createdTables.contains(tableName)){
                 createTable();
@@ -136,7 +137,7 @@ public class RecordDao {
             PreparedStatement ps=conn.prepareStatement("select * from "+tableName+"  order by wid desc limit 1;");
             ResultSet rs=ps.executeQuery();
             rs.next();
-            double balance=rs.getDouble("balance");
+            BigDecimal balance=rs.getBigDecimal("balance");
             return balance;
         }
         catch (SQLException sqle){

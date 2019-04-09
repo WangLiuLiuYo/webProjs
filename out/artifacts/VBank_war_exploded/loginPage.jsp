@@ -16,7 +16,7 @@
         手机号码：<input type="text" maxlength="12" minlength="4" name="phone">
     </p>
     <p>
-        登录密码：<input type="text" maxlength="12" name="password">
+        登录密码：<input type="text" maxlength="20" minlength="6" name="password">
     </p>
     <p>
         您的身份是：

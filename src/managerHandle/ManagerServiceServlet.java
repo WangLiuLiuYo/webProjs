@@ -3,18 +3,46 @@ package managerHandle;
 import commonObject.User;
 import dao.UserDao;
 
-import javax.servlet.ServletException;
+import javax.servlet.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.http.HttpRequest;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.net.http.HttpRequest;
+import java.util.*;
+
+class myFilter implements Filter{
+    @Override
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        Map<String,String> map=new HashMap<>();
+        Enumeration<String> e=servletRequest.getParameterNames();
+
+        Iterator<String> it=e.asIterator();
+        while (it.hasNext()){
+            String p=it.next();
+            map.put(p,servletRequest.getParameter(p));
+        }
+        System.out.println(map);
+    }
+
+    @Override
+    public void destroy() {
+
+    }
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+
+    }
+}
 public class ManagerServiceServlet extends HttpServlet {
     UserDao userDao=new UserDao();
     private boolean checkRoot(HttpServletRequest request){
         String rootPwd=getServletConfig().getInitParameter("root");
+
         boolean b=false;
         for(Cookie cookie:request.getCookies()){
             if(cookie.getName().equals("root")&&cookie.getValue().equals("root")){
@@ -26,6 +54,8 @@ public class ManagerServiceServlet extends HttpServlet {
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        myFilter f=new myFilter();
+        f.doFilter(req,resp,null);
         if(!checkRoot(req)){
             req.setAttribute("flag",20);//flag=20根用户验证失败
             req.getRequestDispatcher("result.jsp").forward(req,resp);
@@ -62,10 +92,10 @@ public class ManagerServiceServlet extends HttpServlet {
             req.getRequestDispatcher("result.jsp").forward(req,resp);
         }
         else if(symbol.equals("money")){
-            double changedNum=Double.valueOf(req.getParameter("changednum"));
+            BigDecimal changedNum=BigDecimal.valueOf(Double.parseDouble(req.getParameter("changednum")));
             String type=req.getParameter("type");
             if(type.equals("sub"))
-                changedNum*=-1;
+                changedNum.subtract(new BigDecimal(1));
             boolean r=userDao.changeBalance(phone,changedNum);
             if(r){
                 req.setAttribute("flag",15);//flag=15,充值/扣款成功

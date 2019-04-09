@@ -16,7 +16,7 @@
         对方卡号：<input type="text" name="cardId">
     </p>
     <p>
-        金额：<input type="number" max="100000.00" min="1.00" name="changednum">
+        金额：<input type="number" max="100000.00" min="0.01" name="changednum">
     </p>
     <input type="submit" value="确定">
 

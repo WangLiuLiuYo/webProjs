@@ -1,6 +1,7 @@
 create database vbanktables;
 use vbanktables;
 SET SQL_SAFE_UPDATES = 0;
+drop table if exists users;
 create table users(
                     username char(12) not null,
                     password char(12) not null default '123456',

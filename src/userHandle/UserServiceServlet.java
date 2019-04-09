@@ -4,15 +4,14 @@ import commonObject.Record;
 import dao.RecordDao;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.SessionTrackingMode;
+import javax.servlet.http.*;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-import Helper.WaterIdMaker;
+import Helper.*;
 public class UserServiceServlet extends HttpServlet {
 
 
@@ -27,20 +26,23 @@ public class UserServiceServlet extends HttpServlet {
             }
         }
         if(myCardId!=null){
+            HttpSession session=req.getSession();
+            cookieConverter converter=(cookieConverter) session.getAttribute("cookieConvert");
+            myCardId=converter.decode(myCardId);
             RecordDao recordDao=new RecordDao(myCardId);
 
-            double myBalance=recordDao.queryBalance();
-            double changedNum=Double.valueOf(req.getParameter("changednum"));
+            BigDecimal myBalance=recordDao.queryBalance();
+            BigDecimal changedNum=BigDecimal.valueOf(Double.parseDouble(req.getParameter("changednum")));
             String toId=req.getParameter("cardId");
             RecordDao yourRD=new RecordDao(toId);
-            double yourBalance=yourRD.queryBalance();
-            if(myBalance<changedNum){
+            BigDecimal yourBalance=yourRD.queryBalance();
+            if(myBalance.compareTo(myBalance)<1){
                 req.setAttribute("flag",4);//flag=4 :余额不足
                 req.getRequestDispatcher("result.jsp").forward(req,resp);
             }
             else{
-                Record mine=new Record(-changedNum,new Date(),toId,WaterIdMaker.getWid(myCardId,toId),myBalance-changedNum);
-                Record yours=new Record(changedNum,new Date(),myCardId,WaterIdMaker.getWid(toId,myCardId),yourBalance+changedNum);
+                Record mine=new Record(changedNum.multiply(BigDecimal.valueOf(-1)),new Date(),toId,WaterIdMaker.getWid(myCardId,toId),myBalance.subtract(changedNum));
+                Record yours=new Record(changedNum,new Date(),myCardId,WaterIdMaker.getWid(toId,myCardId),yourBalance.add(changedNum));
                 recordDao.insertRecord(mine);
                 yourRD.insertRecord(yours);
                 req.setAttribute("flag",5);//flag=5:转账成功
@@ -67,7 +69,7 @@ public class UserServiceServlet extends HttpServlet {
             RecordDao recordDao=new RecordDao(myCardId);
             String param=req.getParameter("q");
             if(param.equals("balance")){
-                double balance=recordDao.queryBalance();
+                BigDecimal balance=recordDao.queryBalance();
                 req.setAttribute("balance",balance);
                 req.setAttribute("flag",8);//flag=8:显示余额查询结果
                 req.getRequestDispatcher("result.jsp").forward(req,resp);

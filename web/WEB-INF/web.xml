@@ -26,6 +26,8 @@
     <servlet>
         <servlet-name>userService</servlet-name>
         <servlet-class>userHandle.UserServiceServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+
     </servlet>
     <servlet-mapping>
         <servlet-name>userService</servlet-name>
@@ -43,4 +45,12 @@
         <servlet-name>managerHandle</servlet-name>
         <url-pattern>/managerservice.do</url-pattern>
     </servlet-mapping>
+    <session-config>
+        <session-timeout>25</session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+            <secure>true</secure>
+        </cookie-config>
+    </session-config>
+
 </web-app>

@@ -16,7 +16,7 @@
   <h2>
     <a href="register.jsp" target="_blank">注册</a>
     <br>
-    <a href="loginPage.jsp" target="_blank">登录</a>
+    <a href="loginHandleServlet" target="_blank">登录</a>
   </h2>
 
   </body>

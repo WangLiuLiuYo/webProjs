@@ -1,34 +1,35 @@
 package commonObject;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class Record {
-    private double change;
+    private BigDecimal change;
     private Date date;
     private String toId;
     private String waterId;
-    private double balance;
+    private BigDecimal balance;
     public Record(){}
-    public Record(double change,Date date,String toId,String waterId,double balance){
+    public Record(BigDecimal change,Date date,String toId,String waterId,BigDecimal balance){
         this.balance=balance;
         this.change=change;
         this.date=date;
         this.toId=toId;
         this.waterId=waterId;
     }
-    public void setBalance(double balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 
-    public double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setChange(double change) {
+    public void setChange(BigDecimal change) {
         this.change = change;
     }
 
-    public double getChange() {
+    public BigDecimal getChange() {
         return change;
     }
 
